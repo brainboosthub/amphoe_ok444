@@ -612,4 +612,5 @@ async function openNewsPopup(item) {
     loadNews();
 
   });
+  document.addEventListener('news-admin-updated', loadNews);
 })();
