@@ -57,10 +57,12 @@
   })[char]);
 
   async function request(params) {
-    const url = new URL(API_URL);
-    Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
-    url.searchParams.set('_t', Date.now());
-    const response = await fetch(url, { method: 'GET', cache: 'no-store' });
+    const token = sessionStorage.getItem('mysiteAdminToken') || '';
+    const response = await fetch(API_URL, {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({}, params, { token }))
+    });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const result = await response.json();
     if (result.success === false) throw new Error(result.message || 'ดำเนินการไม่สำเร็จ');
