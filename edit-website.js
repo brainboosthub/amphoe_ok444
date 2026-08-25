@@ -6,6 +6,51 @@
     text: { title: 'แก้ไขข้อความ', range: 'setting!S1:T4' },
     image: { title: 'แก้ไขโลโก้ ชื่อ รูปหัวเว็บไซต์', range: 'website_image!A1:B4' }
   };
+  let activeHighlight = '';
+  const highlightBox = document.createElement('div');
+  highlightBox.className = 'editwebsite-highlight-box';
+  highlightBox.setAttribute('aria-hidden', 'true');
+
+  function getUnionRect(elements) {
+    const rects = elements
+      .filter(element => element && !element.hidden)
+      .map(element => element.getBoundingClientRect())
+      .filter(rect => rect.width > 0 && rect.height > 0);
+    if (!rects.length) return null;
+    return {
+      top: Math.min(...rects.map(rect => rect.top)),
+      left: Math.min(...rects.map(rect => rect.left)),
+      right: Math.max(...rects.map(rect => rect.right)),
+      bottom: Math.max(...rects.map(rect => rect.bottom))
+    };
+  }
+
+  function updateHighlight() {
+    if (!activeHighlight) return;
+    const targets = activeHighlight === 'text'
+      ? ['heroKickerText', 'heroTitleText', 'heroDescriptionText'].map(id => document.getElementById(id))
+      : [document.getElementById('websiteHeroOverlay')];
+    const rect = getUnionRect(targets);
+    if (!rect) return hideHighlight();
+    const padding = activeHighlight === 'text' ? 18 : 5;
+    highlightBox.style.top = `${Math.max(3, rect.top - padding)}px`;
+    highlightBox.style.left = `${Math.max(3, rect.left - padding)}px`;
+    highlightBox.style.width = `${Math.min(window.innerWidth - Math.max(3, rect.left - padding) - 3, rect.right - rect.left + padding * 2)}px`;
+    highlightBox.style.height = `${Math.min(window.innerHeight - Math.max(3, rect.top - padding) - 3, rect.bottom - rect.top + padding * 2)}px`;
+    highlightBox.classList.add('is-visible');
+  }
+
+  function showHighlight(type) {
+    activeHighlight = type;
+    document.body.classList.toggle('editwebsite-highlight-image', type === 'image');
+    updateHighlight();
+  }
+
+  function hideHighlight() {
+    activeHighlight = '';
+    highlightBox.classList.remove('is-visible');
+    document.body.classList.remove('editwebsite-highlight-image');
+  }
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"]/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
@@ -104,5 +149,18 @@
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-editwebsite]');
     if (button) openEditor(button.dataset.editwebsite);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.appendChild(highlightBox);
+    document.querySelectorAll('.editwebsite-btn[data-editwebsite]').forEach(button => {
+      const type = button.dataset.editwebsite;
+      button.addEventListener('mouseenter', () => showHighlight(type));
+      button.addEventListener('mouseleave', hideHighlight);
+      button.addEventListener('focus', () => showHighlight(type));
+      button.addEventListener('blur', hideHighlight);
+    });
+    window.addEventListener('resize', updateHighlight);
+    window.addEventListener('scroll', updateHighlight, { passive: true });
   });
 })();
