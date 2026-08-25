@@ -15,3 +15,12 @@
 .mysite-login-submit:disabled { opacity: .65; cursor: wait; }
 .mysite-forgot { display: block; margin: 14px auto 0; border: 0; background: none; color: #dc2626; font: 500 14px "Kanit",sans-serif; cursor: pointer; }
 .mysite-login-status { min-height: 22px; margin-top: 10px; color: #b91c1c; text-align: center; }
+
+.learning-source-heading { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: end; gap: 18px; }
+.learning-admin-button { align-self: center; justify-self: center; text-decoration: none; white-space: nowrap; }
+.learning-source-heading #lsbOpenAll { justify-self: end; }
+@media (max-width: 760px) {
+  .learning-source-heading { grid-template-columns: 1fr auto; align-items: center; }
+  .learning-source-heading > div { grid-column: 1 / -1; }
+  .learning-admin-button { justify-self: start; white-space: normal; }
+}
