@@ -4,7 +4,7 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbxvqWwNRKu5GpoVRyDZGdwXRy6ubEgPAg2-stv-G-arF4HRoqkAfP21oTl124ne6CvZ/exec';
   const CONFIG = {
     text: { title: 'แก้ไขข้อความ', range: 'setting!S1:T4' },
-    image: { title: 'แก้ไขภาพ', range: 'settings!A4:B5' }
+    image: { title: 'แก้ไขโลโก้ ชื่อ รูปหัวเว็บไซต์', range: 'website_image!A1:B4' }
   };
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"]/g, char => ({
@@ -34,13 +34,18 @@
     }
 
     const logoUrl = values[0] || '';
-    const heroUrl = values[1] || '';
+    const brandName = values[1] || '';
+    const heroUrl = values[2] || '';
     document.querySelectorAll('[data-website-brand-icon]').forEach(icon => {
       icon.textContent = '';
       icon.style.backgroundImage = logoUrl ? `url("${logoUrl}")` : '';
       icon.style.backgroundSize = 'cover';
       icon.style.backgroundPosition = 'center';
     });
+    document.querySelectorAll('[data-website-brand-name]').forEach(name => {
+      name.textContent = brandName;
+    });
+    if (brandName) document.title = brandName;
     const overlay = document.getElementById('websiteHeroOverlay');
     if (overlay && heroUrl) {
       overlay.style.backgroundImage = `linear-gradient(90deg,rgba(5,28,44,.96) 0%,rgba(5,28,44,.79) 40%,rgba(5,28,44,.1) 78%),url("${heroUrl}")`;
@@ -58,7 +63,8 @@
     try {
       const result = await request({ mode: 'editwebsite', editor: type });
       const rows = Array.isArray(result.rows) ? result.rows : [];
-      const html = `<div class="editwebsite-popup"><table class="editwebsite-table"><thead><tr><th>รายการ</th><th>ข้อมูล</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${escapeHtml(row.label)}</td><td><textarea class="editwebsite-input" data-row="${index}" rows="${type === 'text' && index === 2 ? 3 : 2}">${escapeHtml(row.value)}</textarea></td></tr>`).join('')}</tbody></table><div id="editwebsiteStatus" class="editwebsite-status">แก้ไขข้อมูล แล้วกด “บันทึก”</div></div>`;
+      const headers = Array.isArray(result.headers) ? result.headers : ['รายการ', 'ข้อมูล'];
+      const html = `<div class="editwebsite-popup"><table class="editwebsite-table"><thead><tr><th>${escapeHtml(headers[0] || 'รายการ')}</th><th>${escapeHtml(headers[1] || 'ข้อมูล')}</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${escapeHtml(row.label)}</td><td><textarea class="editwebsite-input" data-row="${index}" rows="${type === 'text' && index === 2 ? 3 : 2}">${escapeHtml(row.value)}</textarea></td></tr>`).join('')}</tbody></table><div id="editwebsiteStatus" class="editwebsite-status">แก้ไขข้อมูล แล้วกด “บันทึก”</div></div>`;
 
       const modal = await Swal.fire({
         title: config.title,
