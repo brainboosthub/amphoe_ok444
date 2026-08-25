@@ -29,6 +29,27 @@
 .editwebsite-btn:hover { background: #b91c1c; transform: translateY(-2px); }
 .editwebsite-btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
+.editwebsite-highlight-box {
+  position: fixed;
+  box-sizing: border-box;
+  z-index: 6;
+  display: none;
+  border: 5px solid #ef2020;
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.28), 0 8px 26px rgba(127,29,29,.28);
+  pointer-events: none;
+  transition: top .12s ease, left .12s ease, width .12s ease, height .12s ease;
+}
+
+.editwebsite-highlight-box.is-visible { display: block; }
+
+body.editwebsite-highlight-image .brand:has([data-website-brand-icon]),
+body.editwebsite-highlight-image .brand:has([data-website-brand-name]) {
+  outline: 4px solid #ef2020;
+  outline-offset: 7px;
+  border-radius: 7px;
+}
+
 .editwebsite-popup { text-align: left; }
 .editwebsite-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .editwebsite-table th, .editwebsite-table td { border: 1px solid #d7dce3; padding: 10px; vertical-align: top; }
@@ -42,4 +63,5 @@
 @media (max-width: 700px) {
   .editwebsite { inset: 10px 10px auto; gap: 8px; }
   .editwebsite-btn { min-height: 36px; padding: 8px 10px; border-radius: 8px; font-size: 12px; }
+  .editwebsite-highlight-box { border-width: 3px; border-radius: 8px; }
 }
